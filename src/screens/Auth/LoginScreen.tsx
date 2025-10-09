@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
-import { styled } from 'nativewind';
-
-const StyledView = styled(View);
-const StyledText = styled(Text);
-const StyledTextInput = styled(TextInput);
-const StyledTouchableOpacity = styled(TouchableOpacity);
-const StyledImage = styled(Image);
+import { login as apiLogin } from '../../services/authService';
 
 import Logo from '../../assets/images/icons/logo.svg';
 
@@ -23,22 +17,45 @@ export default function LoginScreen() {
     console.log('Login com:', { usuario, senha });
   };
 
-  return (
-    <StyledView className="flex-1 items-center justify-center bg-gray-100 dark:bg-dark-background p-4">
-      <StyledView className="w-full max-w-sm">
-        <StyledView className="items-center mb-5">
-          <Logo width={150} height={150} />
-          <StyledText className="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-2">
-            LumiLivre
-          </StyledText>
-        </StyledView>
+  const handleLogin = async () => { 
+    if (!usuario || !senha) {
+        Alert.alert('Atenção', 'Por favor, preencha todos os campos.');
+        return;
+    }
+    
+    setIsLoading(true);
+    try {
+        const responseData = await apiLogin({ user: usuario, senha: senha });
+        
+        // por enquanto
+        Alert.alert('Login bem-sucedido!', `Token: ${responseData.token.substring(0, 30)}...`);
+        
+        // TODO: Implementar AuthContext para salvar o usuário e navegar para a Home.
+        
+    } catch (err: any) {
+        const errorMessage = err.response?.data?.message || err.response?.data || 'Usuário ou senha inválidos.';
+        Alert.alert('Erro no Login', errorMessage);
+    } finally {
+        setIsLoading(false);
+    }
+  };
 
-        <StyledView className="space-y-4">
-          <StyledView>
-            <StyledText className="text-sm font-medium text-lumi-label mb-1 ml-3">
+  return (
+    <View className="flex-1 items-center justify-center bg-gray-100 dark:bg-dark-background p-4">
+      <View className="w-full max-w-sm">
+        <View className="items-center mb-5">
+          <Logo width={150} height={150} />
+          <Text className="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-2">
+            LumiLivre
+          </Text>
+        </View>
+
+        <View className="space-y-4">
+          <View>
+            <Text className="text-sm font-medium text-lumi-label mb-1 ml-3">
               Matrícula ou Email
-            </StyledText>
-            <StyledTextInput
+            </Text>
+            <TextInput
               className="w-full p-4 bg-white dark:bg-dark-card rounded-md text-gray-800 dark:text-gray-100 text-base"
               placeholder="Digite seu usuário"
               placeholderTextColor="#9CA3AF"
@@ -46,13 +63,13 @@ export default function LoginScreen() {
               onChangeText={setUsuario}
               autoCapitalize="none"
             />
-          </StyledView>
+          </View>
 
-          <StyledView>
-            <StyledText className="text-sm font-medium text-lumi-label mb-1 ml-3">
+          <View>
+            <Text className="text-sm font-medium text-lumi-label mb-1 ml-3">
               Senha
-            </StyledText>
-            <StyledTextInput
+            </Text>
+            <TextInput
               className="w-full p-4 bg-white dark:bg-dark-card rounded-md text-gray-800 dark:text-gray-100 text-base"
               placeholder="Digite sua senha"
               placeholderTextColor="#9CA3AF"
@@ -60,25 +77,25 @@ export default function LoginScreen() {
               onChangeText={setSenha}
               secureTextEntry
             />
-          </StyledView>
-        </StyledView>
+          </View>
+        </View>
 
-        <StyledTouchableOpacity
+        <TouchableOpacity
           className="mt-6 w-full bg-lumi-primary py-4 rounded-md shadow-md"
           onPress={handleLogin}
           disabled={isLoading}
         >
-          <StyledText className="text-white text-center font-bold text-lg">
+          <Text className="text-white text-center font-bold text-lg">
             {isLoading ? 'Entrando...' : 'ENTRAR'}
-          </StyledText>
-        </StyledTouchableOpacity>
+          </Text>
+        </TouchableOpacity>
 
-        <StyledTouchableOpacity className="mt-4">
-          <StyledText className="text-center text-gray-500 dark:text-gray-400 underline">
+        <TouchableOpacity className="mt-4">
+          <Text className="text-center text-gray-500 dark:text-gray-400 underline">
             Esqueceu sua senha?
-          </StyledText>
-        </StyledTouchableOpacity>
-      </StyledView>
-    </StyledView>
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
