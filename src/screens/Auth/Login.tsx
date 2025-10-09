@@ -7,14 +7,25 @@ import {
   Alert,
   Image,
 } from 'react-native';
+
 import { login as apiLogin } from '../../services/authService';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../navigation/AppNavigator';
 
 import Logo from '../../assets/images/icons/logo.svg';
+
+type LoginNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Login'
+>;
 
 export default function LoginScreen() {
   const [usuario, setUsuario] = useState('');
   const [senha, setSenha] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const navigation = useNavigation<LoginNavigationProp>();
 
   const handleLogin = async () => {
     if (!usuario || !senha) {
@@ -94,7 +105,10 @@ export default function LoginScreen() {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity className="mt-4">
+        <TouchableOpacity
+          className="mt-4"
+          onPress={() => navigation.navigate('ForgotPassword')}
+        >
           <Text className="text-center text-gray-500 dark:text-gray-400 underline">
             Esqueceu sua senha?
           </Text>
