@@ -25,6 +25,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": { 
+      "API_BASE_URL": "https://api.lumilivre.com.br:8080"
     }
   }
 }
