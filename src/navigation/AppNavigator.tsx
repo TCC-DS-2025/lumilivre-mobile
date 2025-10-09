@@ -9,7 +9,7 @@ import LoginScreen from '../screens/Auth/LoginScreen';
 export type RootStackParamList = {
   Login: undefined;
   ForgotPassword: undefined;
-  ChangePassword: { token: string }; 
+  ChangePassword: { token: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

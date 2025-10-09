@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  Image,
+} from 'react-native';
 import { login as apiLogin } from '../../services/authService';
 
 import Logo from '../../assets/images/icons/logo.svg';
@@ -9,34 +16,31 @@ export default function LoginScreen() {
   const [senha, setSenha] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!usuario || !senha) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+      Alert.alert('Atenção', 'Por favor, preencha todos os campos.');
       return;
     }
-    console.log('Login com:', { usuario, senha });
-  };
 
-  const handleLogin = async () => { 
-    if (!usuario || !senha) {
-        Alert.alert('Atenção', 'Por favor, preencha todos os campos.');
-        return;
-    }
-    
     setIsLoading(true);
     try {
-        const responseData = await apiLogin({ user: usuario, senha: senha });
-        
-        // por enquanto
-        Alert.alert('Login bem-sucedido!', `Token: ${responseData.token.substring(0, 30)}...`);
-        
-        // TODO: Implementar AuthContext para salvar o usuário e navegar para a Home.
-        
+      const responseData = await apiLogin({ user: usuario, senha: senha });
+
+      // por enquanto
+      Alert.alert(
+        'Login bem-sucedido!',
+        `Token: ${responseData.token.substring(0, 30)}...`,
+      );
+
+      // TODO: Implementar AuthContext para salvar o usuário e navegar para a Home.
     } catch (err: any) {
-        const errorMessage = err.response?.data?.message || err.response?.data || 'Usuário ou senha inválidos.';
-        Alert.alert('Erro no Login', errorMessage);
+      const errorMessage =
+        err.response?.data?.message ||
+        err.response?.data ||
+        'Usuário ou senha inválidos.';
+      Alert.alert('Erro no Login', errorMessage);
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
 
