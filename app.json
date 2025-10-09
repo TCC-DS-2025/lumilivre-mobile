@@ -1,32 +1,29 @@
 {
   "expo": {
-    "name": "lumilivre-mobile",
-    "slug": "lumilivre-mobile",
+    "name": "LumiLivre",
+    "slug": "LumiLivre",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./src/assets/images/icons/logo.png", 
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./src/assets/images/icons/logo.png", 
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#762075"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+        "foregroundImage": "./src/assets/images/icons/logo.png",
+        "backgroundColor": "#FFFFFF"
+      }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./src/assets/images/icons/logo.png" 
     },
-    "extra": { 
+    "extra": {
       "API_BASE_URL": "https://api.lumilivre.com.br:8080"
     }
   }
