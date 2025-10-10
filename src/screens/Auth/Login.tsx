@@ -5,15 +5,13 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
-  Image,
-} from 'react-native';
+  Image
+  } from 'react-native';
 
 import { login as apiLogin } from '../../services/authService';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-
-import Logo from '../../assets/images/icons/logo.svg';
 
 type LoginNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -59,7 +57,11 @@ export default function LoginScreen() {
     <View className="flex-1 items-center justify-center bg-gray-100 dark:bg-dark-background p-4">
       <View className="w-full max-w-sm">
         <View className="items-center mb-5">
-          <Logo width={150} height={150} />
+            <Image
+              source={require('../../assets/images/icons/logo.png')}
+              className="w-[150px] h-[150px]"
+              resizeMode="contain"
+            />
           <Text className="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-2">
             LumiLivre
           </Text>

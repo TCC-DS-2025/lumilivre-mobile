@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { RootStackParamList } from '../../navigation/AppNavigator';
-
-import Logo from '../../assets/images/icons/logo.svg';
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -28,7 +26,11 @@ export default function ForgotPasswordScreen() {
     <View className="flex-1 items-center justify-center bg-gray-100 dark:bg-dark-background p-4">
       <View className="w-full max-w-sm">
         <View className="items-center mb-5">
-          <Logo width={150} height={150} />
+            <Image
+              source={require('../../assets/images/icons/logo.png')}
+              className="w-[150px] h-[150px]"
+              resizeMode="contain"
+            />
         </View>
         <Text className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-2">
           Esqueci Minha Senha
