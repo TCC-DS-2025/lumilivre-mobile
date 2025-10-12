@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,9 +8,11 @@ import {
   Image,
   StyleSheet,
   SafeAreaView,
+  Pressable,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import * as LocalAuthentication from 'expo-local-authentication';
 
 import { AuthStackParamList } from '../../navigation/AppNavigator';
 import { useAuth } from '../../contexts/AuthContext';
@@ -25,21 +27,63 @@ export default function LoginScreen() {
   const { login } = useAuth();
   const navigation = useNavigation<LoginNavigationProp>();
 
-  const handleLogin = async () => {
-    if (!usuario || !senha) {
-      Alert.alert('Atenção', 'Por favor, preencha todos os campos.');
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const responseData = await apiLogin({ user: usuario, senha: senha });
-      await login(responseData);
-    } catch (err: any) {
+  const [isBiometrySupported, setIsBiometrySupported] = useState(false);
+
+    useEffect(() => {
+      (async () => {
+        const compatible = await LocalAuthentication.hasHardwareAsync();
+        setIsBiometrySupported(compatible);
+      })();
+    }, []);
+
+    const handleBiometricAuth = async () => {
+      const savedCredentials = await getSavedCredentials();
+      if (!savedCredentials) {
+        Alert.alert('Atenção', 'Faça login com sua senha uma vez antes de usar a biometria.');
+        return;
+      }
+
+      const biometricAuth = await LocalAuthentication.authenticateAsync({
+        promptMessage: 'Login no LumiLivre'
+      });
+
+      if (biometricAuth.success) {
+        setUsuario(savedCredentials.user);
+        setSenha(savedCredentials.password);
+        Alert.alert('Sucesso', 'Biometria reconhecida! Fazendo login...');
+        await handleLogin(savedCredentials.user, savedCredentials.password);
+      }
+    };
+
+    const handleLogin = async (userParam?: string, passwordParam?: string) => {
+      const userToLogin = userParam || usuario;
+      const passwordToLogin = passwordParam || senha;
+
+      if (!userToLogin || !passwordToLogin) {
+        Alert.alert('Atenção', 'Por favor, preencha todos os campos.');
+        return;
+      }
+      setIsLoading(true);
+      try {
+        const responseData = await apiLogin({ user: userToLogin, senha: passwordToLogin });
+        await login(responseData);
+        await saveCredentials(userToLogin, passwordToLogin);
+      } catch (err: any) {
       const errorMessage = err.response?.data?.message || err.response?.data || 'Usuário ou senha inválidos.';
       Alert.alert('Erro no Login', errorMessage);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // salva e pega credenciais (sem criptografia por enquanto)
+  const saveCredentials = async (user: string, pass: string) => {
+    await AsyncStorage.setItem('@LumiLivre:credentials', JSON.stringify({ user, pass }));
+  };
+
+  const getSavedCredentials = async () => {
+    const creds = await AsyncStorage.getItem('@LumiLivre:credentials');
+    return creds ? JSON.parse(creds) : null;
   };
 
   return (
@@ -89,6 +133,13 @@ export default function LoginScreen() {
             {isLoading ? 'Entrando...' : 'ENTRAR'}
           </Text>
         </TouchableOpacity>
+
+        {isBiometrySupported && (
+            <Pressable style={styles.biometricButton} onPress={handleBiometricAuth}>
+                    {/* ícone de impressão digital aqui */}
+                <Text style={styles.biometricText}>Entrar com digital</Text>
+            </Pressable>
+        )}
 
         <TouchableOpacity
           style={styles.forgotPasswordContainer}
@@ -174,5 +225,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#6B7280',
     textDecorationLine: 'underline',
+  },
+  biometricButton: {
+      marginTop: 20,
+      padding: 10,
+  },
+  biometricText: {
+    color: '#762075',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 16,
   },
 });
