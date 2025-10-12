@@ -4,28 +4,35 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import Login from '../screens/Auth/Login';
 import ForgotPassword from '../screens/Auth/ForgotPassword';
-// import ChangePasswordScreen from '../screens/Auth/ChangePasswordScreen';
+import ChangePassword from '../screens/Auth/ChangePassword';
+import HomeScreen from '../screens/App/Home';
 
-export type RootStackParamList = {
+export type AuthStackParamList = {
   Login: undefined;
   ForgotPassword: undefined;
   ChangePassword: { token: string };
 };
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+export type AppStackParamList = {
+  Home: undefined;
+};
+
+const AuthStack = createNativeStackNavigator<AuthStackParamList>();
+const AppStack = createNativeStackNavigator<AppStackParamList>();
 
 export default function AppNavigator() {
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-        {/* <Stack.Screen name="ChangePassword" component={ChangePassword} /> */}
-      </Stack.Navigator>
+          {isAuthenticated ? (
+            <AppStack.Navigator screenOptions={{ headerShown: false }}>
+              <AppStack.Screen name="Home" component={HomeScreen} />
+            </AppStack.Navigator>
+          ) : (
+            <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+              <AuthStack.Screen name="Login" component={Login} />
+              <AuthStack.Screen name="ForgotPassword" component={ForgotPassword} />
+              <AuthStack.Screen name="ChangePassword" component={ChangePassword} />
+            </AuthStack.Navigator>
+          )}
     </NavigationContainer>
-  );
-}
+);
