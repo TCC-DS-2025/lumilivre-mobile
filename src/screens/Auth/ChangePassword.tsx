@@ -13,7 +13,10 @@ import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { AuthStackParamList } from '../../navigation/AppNavigator';
-import { validarTokenReset, mudarSenhaComToken } from '../../services/authService';
+import {
+  validarTokenReset,
+  mudarSenhaComToken,
+} from '../../services/authService';
 
 type ChangePasswordRouteProp = RouteProp<AuthStackParamList, 'ChangePassword'>;
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Login'>;
@@ -46,7 +49,9 @@ export default function ChangePasswordScreen() {
         if (isValid) {
           setIsTokenValid(true);
         } else {
-          setError('Token inválido ou expirado. Por favor, solicite um novo link.');
+          setError(
+            'Token inválido ou expirado. Por favor, solicite um novo link.',
+          );
         }
       } catch {
         setError('Ocorreu um erro ao validar o token. Tente novamente.');
@@ -75,12 +80,16 @@ export default function ChangePasswordScreen() {
     setIsLoading(true);
     try {
       await mudarSenhaComToken(token, novaSenha);
-      setSuccessMessage('Senha alterada com sucesso! Redirecionando para o login...');
+      setSuccessMessage(
+        'Senha alterada com sucesso! Redirecionando para o login...',
+      );
       setTimeout(() => {
         navigation.navigate('Login');
       }, 3000);
     } catch (err: any) {
-      setError(err.response?.data?.mensagem || 'Não foi possível alterar a senha.');
+      setError(
+        err.response?.data?.mensagem || 'Não foi possível alterar a senha.',
+      );
     } finally {
       setIsLoading(false);
     }
@@ -95,7 +104,9 @@ export default function ChangePasswordScreen() {
       return (
         <View style={{ alignItems: 'center' }}>
           <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('ForgotPassword')}
+          >
             <Text style={styles.linkText}>Solicitar novo link</Text>
           </TouchableOpacity>
         </View>
@@ -138,7 +149,9 @@ export default function ChangePasswordScreen() {
             onPress={handleSubmit}
             disabled={isLoading}
           >
-            <Text style={styles.buttonText}>{isLoading ? 'Salvando...' : 'SALVAR NOVA SENHA'}</Text>
+            <Text style={styles.buttonText}>
+              {isLoading ? 'Salvando...' : 'SALVAR NOVA SENHA'}
+            </Text>
           </TouchableOpacity>
         </>
       );

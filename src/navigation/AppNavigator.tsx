@@ -23,16 +23,17 @@ const AppStack = createNativeStackNavigator<AppStackParamList>();
 export default function AppNavigator() {
   return (
     <NavigationContainer>
-          {isAuthenticated ? (
-            <AppStack.Navigator screenOptions={{ headerShown: false }}>
-              <AppStack.Screen name="Home" component={HomeScreen} />
-            </AppStack.Navigator>
-          ) : (
-            <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-              <AuthStack.Screen name="Login" component={Login} />
-              <AuthStack.Screen name="ForgotPassword" component={ForgotPassword} />
-              <AuthStack.Screen name="ChangePassword" component={ChangePassword} />
-            </AuthStack.Navigator>
-          )}
+      {isAuthenticated ? (
+        <AppStack.Navigator screenOptions={{ headerShown: false }}>
+          <AppStack.Screen name="Home" component={HomeScreen} />
+        </AppStack.Navigator>
+      ) : (
+        <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+          <AuthStack.Screen name="Login" component={Login} />
+          <AuthStack.Screen name="ForgotPassword" component={ForgotPassword} />
+          <AuthStack.Screen name="ChangePassword" component={ChangePassword} />
+        </AuthStack.Navigator>
+      )}
     </NavigationContainer>
-);
+  );
+}

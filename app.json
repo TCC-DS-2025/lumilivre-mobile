@@ -7,7 +7,7 @@
     "icon": "./src/assets/images/icons/logo-foreground.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./src/assets/images/icons/logo.png",
+      "image": "./src/assets/images/icons/logo-foreground.png",
       "resizeMode": "contain",
       "backgroundColor": "#762075"
     },
@@ -22,7 +22,7 @@
       "package": "com.anonymous.LumiLivre"
     },
     "web": {
-      "favicon": "./src/assets/images/icons/logo.png"
+      "favicon": "./src/assets/images/icons/logo-foreground.png"
     },
     "extra": {
       "API_BASE_URL": "http://localhost:8080"

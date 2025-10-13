@@ -1,11 +1,23 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, Image, StyleSheet, SafeAreaView } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  Image,
+  StyleSheet,
+  SafeAreaView,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { AuthStackParamList } from '../../navigation/AppNavigator';
 
-type NavigationProp = NativeStackNavigationProp<AuthStackParamList, 'ForgotPassword'>;
+type NavigationProp = NativeStackNavigationProp<
+  AuthStackParamList,
+  'ForgotPassword'
+>;
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState('');
@@ -54,10 +66,11 @@ export default function ForgotPasswordScreen() {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Text style={styles.backButtonText}>
-            Voltar para o Login
-          </Text>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.backButtonText}>Voltar para o Login</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

@@ -18,7 +18,10 @@ import { AuthStackParamList } from '../../navigation/AppNavigator';
 import { useAuth } from '../../contexts/AuthContext';
 import { login as apiLogin } from '../../services/authService';
 
-type LoginNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Login'>;
+type LoginNavigationProp = NativeStackNavigationProp<
+  AuthStackParamList,
+  'Login'
+>;
 
 export default function LoginScreen() {
   const [usuario, setUsuario] = useState('');
@@ -29,47 +32,56 @@ export default function LoginScreen() {
 
   const [isBiometrySupported, setIsBiometrySupported] = useState(false);
 
-    useEffect(() => {
-      (async () => {
-        const compatible = await LocalAuthentication.hasHardwareAsync();
-        setIsBiometrySupported(compatible);
-      })();
-    }, []);
+  useEffect(() => {
+    (async () => {
+      const compatible = await LocalAuthentication.hasHardwareAsync();
+      setIsBiometrySupported(compatible);
+    })();
+  }, []);
 
-    const handleBiometricAuth = async () => {
-      const savedCredentials = await getSavedCredentials();
-      if (!savedCredentials) {
-        Alert.alert('Atenção', 'Faça login com sua senha uma vez antes de usar a biometria.');
-        return;
-      }
+  const handleBiometricAuth = async () => {
+    const savedCredentials = await getSavedCredentials();
+    if (!savedCredentials) {
+      Alert.alert(
+        'Atenção',
+        'Faça login com sua senha uma vez antes de usar a biometria.',
+      );
+      return;
+    }
 
-      const biometricAuth = await LocalAuthentication.authenticateAsync({
-        promptMessage: 'Login no LumiLivre'
+    const biometricAuth = await LocalAuthentication.authenticateAsync({
+      promptMessage: 'Login no LumiLivre',
+    });
+
+    if (biometricAuth.success) {
+      setUsuario(savedCredentials.user);
+      setSenha(savedCredentials.password);
+      Alert.alert('Sucesso', 'Biometria reconhecida! Fazendo login...');
+      await handleLogin(savedCredentials.user, savedCredentials.password);
+    }
+  };
+
+  const handleLogin = async (userParam?: string, passwordParam?: string) => {
+    const userToLogin = userParam || usuario;
+    const passwordToLogin = passwordParam || senha;
+
+    if (!userToLogin || !passwordToLogin) {
+      Alert.alert('Atenção', 'Por favor, preencha todos os campos.');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const responseData = await apiLogin({
+        user: userToLogin,
+        senha: passwordToLogin,
       });
-
-      if (biometricAuth.success) {
-        setUsuario(savedCredentials.user);
-        setSenha(savedCredentials.password);
-        Alert.alert('Sucesso', 'Biometria reconhecida! Fazendo login...');
-        await handleLogin(savedCredentials.user, savedCredentials.password);
-      }
-    };
-
-    const handleLogin = async (userParam?: string, passwordParam?: string) => {
-      const userToLogin = userParam || usuario;
-      const passwordToLogin = passwordParam || senha;
-
-      if (!userToLogin || !passwordToLogin) {
-        Alert.alert('Atenção', 'Por favor, preencha todos os campos.');
-        return;
-      }
-      setIsLoading(true);
-      try {
-        const responseData = await apiLogin({ user: userToLogin, senha: passwordToLogin });
-        await login(responseData);
-        await saveCredentials(userToLogin, passwordToLogin);
-      } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.response?.data || 'Usuário ou senha inválidos.';
+      await login(responseData);
+      await saveCredentials(userToLogin, passwordToLogin);
+    } catch (err: any) {
+      const errorMessage =
+        err.response?.data?.message ||
+        err.response?.data ||
+        'Usuário ou senha inválidos.';
       Alert.alert('Erro no Login', errorMessage);
     } finally {
       setIsLoading(false);
@@ -78,7 +90,10 @@ export default function LoginScreen() {
 
   // salva e pega credenciais (sem criptografia por enquanto)
   const saveCredentials = async (user: string, pass: string) => {
-    await AsyncStorage.setItem('@LumiLivre:credentials', JSON.stringify({ user, pass }));
+    await AsyncStorage.setItem(
+      '@LumiLivre:credentials',
+      JSON.stringify({ user, pass }),
+    );
   };
 
   const getSavedCredentials = async () => {
@@ -135,10 +150,13 @@ export default function LoginScreen() {
         </TouchableOpacity>
 
         {isBiometrySupported && (
-            <Pressable style={styles.biometricButton} onPress={handleBiometricAuth}>
-                    {/* ícone de impressão digital aqui */}
-                <Text style={styles.biometricText}>Entrar com digital</Text>
-            </Pressable>
+          <Pressable
+            style={styles.biometricButton}
+            onPress={handleBiometricAuth}
+          >
+            {/* ícone de impressão digital aqui */}
+            <Text style={styles.biometricText}>Entrar com digital</Text>
+          </Pressable>
         )}
 
         <TouchableOpacity
@@ -227,8 +245,8 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   biometricButton: {
-      marginTop: 20,
-      padding: 10,
+    marginTop: 20,
+    padding: 10,
   },
   biometricText: {
     color: '#762075',
