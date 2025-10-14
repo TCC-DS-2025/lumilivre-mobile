@@ -99,8 +99,6 @@ export default function TabNavigator() {
   );
 }
 
-const { width } = Dimensions.get('window');
-
 const styles = StyleSheet.create({
   tabBar: {
     position: 'absolute',
@@ -108,7 +106,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 90,
-    width: width,
     paddingTop: 20,
     backgroundColor: '#762075',
     borderTopWidth: 0,
