@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   StyleSheet,
   SafeAreaView,
   Pressable,
+  Animated,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -17,6 +18,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import { AuthStackParamList } from '../../navigation/AppNavigator';
 import { useAuth } from '../../contexts/AuthContext';
 import { login as apiLogin } from '../../services/authService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type LoginNavigationProp = NativeStackNavigationProp<
   AuthStackParamList,
@@ -32,12 +34,20 @@ export default function LoginScreen() {
 
   const [isBiometrySupported, setIsBiometrySupported] = useState(false);
 
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     (async () => {
       const compatible = await LocalAuthentication.hasHardwareAsync();
       setIsBiometrySupported(compatible);
     })();
-  }, []);
+
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim]);
 
   const handleBiometricAuth = async () => {
     const savedCredentials = await getSavedCredentials();
@@ -103,69 +113,75 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <View style={styles.logoContainer}>
-          <Image
-            source={require('../../assets/images/icons/logo.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <Text style={styles.title}>LumiLivre</Text>
-        </View>
-
-        <View style={styles.formContainer}>
-          <View>
-            <Text style={styles.label}>Matrícula ou Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Digite seu usuário"
-              placeholderTextColor="#9CA3AF"
-              value={usuario}
-              onChangeText={setUsuario}
-              autoCapitalize="none"
+      <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+        <View style={styles.container}>
+          <View style={styles.logoContainer}>
+            <Image
+              source={require('../../assets/images/icons/logo.png')}
+              style={styles.logo}
+              resizeMode="contain"
             />
+            <Text style={styles.title}>LumiLivre</Text>
           </View>
 
-          <View>
-            <Text style={styles.label}>Senha</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Digite sua senha"
-              placeholderTextColor="#9CA3AF"
-              value={senha}
-              onChangeText={setSenha}
-              secureTextEntry
-            />
+          <View style={styles.formContainer}>
+            <View>
+              <Text style={styles.label}>Matrícula ou Email</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Digite seu usuário"
+                placeholderTextColor="#9CA3AF"
+                value={usuario}
+                onChangeText={setUsuario}
+                autoCapitalize="none"
+              />
+            </View>
+
+            <View>
+              <Text style={styles.label}>Senha</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Digite sua senha"
+                placeholderTextColor="#9CA3AF"
+                value={senha}
+                onChangeText={setSenha}
+                secureTextEntry
+              />
+            </View>
           </View>
-        </View>
 
-        <TouchableOpacity
-          style={[styles.button, isLoading && styles.buttonDisabled]}
-          onPress={handleLogin}
-          disabled={isLoading}
-        >
-          <Text style={styles.buttonText}>
-            {isLoading ? 'Entrando...' : 'ENTRAR'}
-          </Text>
-        </TouchableOpacity>
-
-        {isBiometrySupported && (
-          <Pressable
-            style={styles.biometricButton}
-            onPress={handleBiometricAuth}
+          <TouchableOpacity
+            style={[styles.button, isLoading && styles.buttonDisabled]}
+            onPress={handleLogin} // onPressIn?
+            disabled={isLoading}
           >
-            {/* ícone de impressão digital aqui */}
-            <Text style={styles.biometricText}>Entrar com digital</Text>
-          </Pressable>
-        )}
+            <Text style={styles.buttonText}>
+              {isLoading ? 'Entrando...' : 'ENTRAR'}
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.forgotPasswordContainer}
-          onPress={() => navigation.navigate('ForgotPassword')}
-        >
-          <Text style={styles.forgotPasswordText}>Esqueceu sua senha?</Text>
-        </TouchableOpacity>
-      </View>
+          {isBiometrySupported && (
+            <Pressable
+              style={styles.biometricButton}
+              onPress={handleBiometricAuth}
+            >
+              <Image
+                source={require('../../assets/images/icons/biometric.png')}
+                style={styles.biometicImage}
+                resizeMode="contain"
+              />
+              <Text style={styles.biometricText}>Entrar com digital</Text>
+            </Pressable>
+          )}
+
+          <TouchableOpacity
+            style={styles.forgotPasswordContainer}
+            onPress={() => navigation.navigate('ForgotPassword')}
+          >
+            <Text style={styles.forgotPasswordText}>Esqueceu sua senha?</Text>
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
     </SafeAreaView>
   );
 }
@@ -253,5 +269,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 16,
+  },
+  biometicImage: {
+    width: 15,
+    height: 15,
   },
 });

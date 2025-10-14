@@ -1,11 +1,14 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { View, ActivityIndicator } from 'react-native';
 
-import Login from '../screens/Auth/Login';
-import ForgotPassword from '../screens/Auth/ForgotPassword';
-import ChangePassword from '../screens/Auth/ChangePassword';
-import HomeScreen from '../screens/App/Home';
+import { useAuth } from '../contexts/AuthContext';
+import LoginScreen from '../screens/Auth/Login';
+import ForgotPasswordScreen from '../screens/Auth/ForgotPassword';
+import ChangePasswordScreen from '../screens/Auth/ChangePassword';
+
+import TabNavigator from './TabNavigator';
 
 export type AuthStackParamList = {
   Login: undefined;
@@ -14,24 +17,40 @@ export type AuthStackParamList = {
 };
 
 export type AppStackParamList = {
-  Home: undefined;
+  MainTabs: undefined;
 };
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 const AppStack = createNativeStackNavigator<AppStackParamList>();
 
 export default function AppNavigator() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#762075" />
+      </View>
+    );
+  }
+
   return (
     <NavigationContainer>
       {isAuthenticated ? (
         <AppStack.Navigator screenOptions={{ headerShown: false }}>
-          <AppStack.Screen name="Home" component={HomeScreen} />
+          <AppStack.Screen name="MainTabs" component={TabNavigator} />
         </AppStack.Navigator>
       ) : (
         <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-          <AuthStack.Screen name="Login" component={Login} />
-          <AuthStack.Screen name="ForgotPassword" component={ForgotPassword} />
-          <AuthStack.Screen name="ChangePassword" component={ChangePassword} />
+          <AuthStack.Screen name="Login" component={LoginScreen} />
+          <AuthStack.Screen
+            name="ForgotPassword"
+            component={ForgotPasswordScreen}
+          />
+          <AuthStack.Screen
+            name="ChangePassword"
+            component={ChangePasswordScreen}
+          />
         </AuthStack.Navigator>
       )}
     </NavigationContainer>
