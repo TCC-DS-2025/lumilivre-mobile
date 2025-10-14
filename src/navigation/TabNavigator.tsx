@@ -1,11 +1,13 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View, ImageStyle, StyleProp, Dimensions } from 'react-native'; 
 
+// Nossas Telas
 import HomeScreen from '../screens/App/Home';
-import SearchScreen from '../screens/App/Search';
+import SearchScreen from '../screens/App/Search'; 
 import ProfileScreen from '../screens/App/Profile';
 
+// Ícones
 const homeIcon = require('../assets/images/icons/home.png');
 const homeActiveIcon = require('../assets/images/icons/home-active.png');
 const searchIcon = require('../assets/images/icons/search.png');
@@ -21,11 +23,17 @@ export type TabParamList = {
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
-const TabBarItem = ({ focused, activeIcon, inactiveIcon, label }: any) => (
+const TabBarItem = ({ focused, activeIcon, inactiveIcon, label, iconStyle }: {
+  focused: boolean;
+  activeIcon: any;
+  inactiveIcon: any;
+  label: string;
+  iconStyle?: StyleProp<ImageStyle>; 
+}) => (
   <View style={styles.tabItemContainer}>
     <Image
       source={focused ? activeIcon : inactiveIcon}
-      style={[styles.icon, { tintColor: focused ? '#FFFFFF' : '#C9C9C9' }]}
+      style={[styles.icon, { tintColor: focused ? '#FFFFFF' : '#C9C9C9' }, iconStyle]}
       resizeMode="contain"
     />
     <Text style={[styles.label, { color: focused ? '#FFFFFF' : '#C9C9C9' }]}>
@@ -53,7 +61,7 @@ export default function TabNavigator() {
               focused={focused}
               activeIcon={searchActiveIcon}
               inactiveIcon={searchIcon}
-              label="Livros" 
+              label="Livros"
             />
           ),
         }}
@@ -67,7 +75,8 @@ export default function TabNavigator() {
               focused={focused}
               activeIcon={homeActiveIcon}
               inactiveIcon={homeIcon}
-              label="Catálogo" 
+              label="Catálogo"
+              iconStyle={styles.homeIcon}
             />
           ),
         }}
@@ -81,7 +90,7 @@ export default function TabNavigator() {
               focused={focused}
               activeIcon={profileActiveIcon}
               inactiveIcon={profileIcon}
-              label="Perfil" 
+              label="Perfil"
             />
           ),
         }}
@@ -90,15 +99,18 @@ export default function TabNavigator() {
   );
 }
 
+const { width } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
   tabBar: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    height: 80,
-    paddingTop: 15,
-    backgroundColor: '#762075', 
+    height: 90,
+    width: width,
+    paddingTop: 20,
+    backgroundColor: '#762075',
     borderTopWidth: 0,
     elevation: 10,
     shadowColor: '#000',
@@ -109,11 +121,14 @@ const styles = StyleSheet.create({
   tabItemContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    top: 5,
   },
   icon: {
-    width: 32, 
-    height: 32,
+    width: 30, 
+    height: 30,
+  },
+  homeIcon: {
+    width: 42, 
+    height: 42,
   },
   label: {
     fontSize: 12,
