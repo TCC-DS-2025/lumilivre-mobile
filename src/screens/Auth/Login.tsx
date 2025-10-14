@@ -10,15 +10,17 @@ import {
   SafeAreaView,
   Pressable,
   Animated,
+  Switch,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as LocalAuthentication from 'expo-local-authentication';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { AuthStackParamList } from '../../navigation/AppNavigator';
 import { useAuth } from '../../contexts/AuthContext';
 import { login as apiLogin } from '../../services/authService';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import ThemeToggle from '../../components/ThemeToggle';
 
 type LoginNavigationProp = NativeStackNavigationProp<
   AuthStackParamList,
@@ -31,15 +33,31 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigation = useNavigation<LoginNavigationProp>();
+  const [keepConnected, setKeepConnected] = useState(true);
 
-  const [isBiometrySupported, setIsBiometrySupported] = useState(false);
+  const [biometryType, setBiometryType] = useState<string | null>(null);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    // login com biometria ou reconhecimento facial
     (async () => {
       const compatible = await LocalAuthentication.hasHardwareAsync();
-      setIsBiometrySupported(compatible);
+      if (compatible) {
+        const types =
+          await LocalAuthentication.supportedAuthenticationTypesAsync();
+        if (
+          types.includes(
+            LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION,
+          )
+        ) {
+          setBiometryType('Rosto');
+        } else if (
+          types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)
+        ) {
+          setBiometryType('Digital');
+        }
+      }
     })();
 
     Animated.timing(fadeAnim, {
@@ -61,6 +79,8 @@ export default function LoginScreen() {
 
     const biometricAuth = await LocalAuthentication.authenticateAsync({
       promptMessage: 'Login no LumiLivre',
+      cancelLabel: 'Cancelar',
+      disableDeviceFallback: true,
     });
 
     if (biometricAuth.success) {
@@ -150,6 +170,19 @@ export default function LoginScreen() {
             </View>
           </View>
 
+          <View style={styles.extraOptionsContainer}>
+            <View style={styles.switchContainer}>
+              <Switch
+                trackColor={{ false: '#767577', true: '#C964C5' }}
+                thumbColor={keepConnected ? '#762075' : '#f4f3f4'}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={setKeepConnected}
+                value={keepConnected}
+              />
+              <Text style={styles.switchLabel}>Continuar Conectado</Text>
+            </View>
+          </View>
+
           <TouchableOpacity
             style={[styles.button, isLoading && styles.buttonDisabled]}
             onPress={handleLogin} // onPressIn?
@@ -160,17 +193,19 @@ export default function LoginScreen() {
             </Text>
           </TouchableOpacity>
 
-          {isBiometrySupported && (
+          {biometryType && (
             <Pressable
               style={styles.biometricButton}
               onPress={handleBiometricAuth}
             >
               <Image
                 source={require('../../assets/images/icons/biometric.png')}
-                style={styles.biometicImage}
+                style={styles.biometricImage}
                 resizeMode="contain"
               />
-              <Text style={styles.biometricText}>Entrar com digital</Text>
+              <Text style={styles.biometricText}>
+                Entrar com {biometryType}
+              </Text>
             </Pressable>
           )}
 
@@ -180,8 +215,21 @@ export default function LoginScreen() {
           >
             <Text style={styles.forgotPasswordText}>Esqueceu sua senha?</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.guestButton}
+            onPress={() =>
+              Alert.alert('Navegação', 'Indo para a tela de convidado...')
+            }
+          >
+            <Text style={styles.guestButtonText}>Entrar como Convidado</Text>
+          </TouchableOpacity>
         </View>
       </Animated.View>
+
+      <View style={styles.themeToggleContainer}>
+        <ThemeToggle />
+      </View>
     </SafeAreaView>
   );
 }
@@ -212,11 +260,10 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: 'bold',
     color: '#1F2937',
-    marginTop: 8,
   },
   formContainer: {
     width: '100%',
-    gap: 16,
+    gap: 10,
   },
   label: {
     fontSize: 14,
@@ -263,6 +310,10 @@ const styles = StyleSheet.create({
   biometricButton: {
     marginTop: 20,
     padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
   },
   biometricText: {
     color: '#762075',
@@ -270,8 +321,43 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
   },
-  biometicImage: {
-    width: 15,
-    height: 15,
+  biometricImage: {
+    width: 24,
+    height: 24,
+  },
+  guestButton: {
+    marginTop: 24,
+    borderWidth: 2,
+    borderColor: '#762075',
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+  },
+  guestButtonText: {
+    color: '#762075',
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  extraOptionsContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    marginTop: 16,
+    paddingHorizontal: 12,
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  switchLabel: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: '#374151',
+  },
+  themeToggleContainer: {
+    position: 'absolute',
+    bottom: 30,
+    left: 30,
   },
 });
