@@ -31,7 +31,7 @@ export default function LoginScreen() {
   const [usuario, setUsuario] = useState('');
   const [senha, setSenha] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, loginAsGuest } = useAuth(); // login + convidado
   const navigation = useNavigation<LoginNavigationProp>();
   const [keepConnected, setKeepConnected] = useState(true);
 
@@ -185,7 +185,7 @@ export default function LoginScreen() {
 
           <TouchableOpacity
             style={[styles.button, isLoading && styles.buttonDisabled]}
-            onPress={handleLogin} // onPressIn?
+            onPress={() => handleLogin()} 
             disabled={isLoading}
           >
             <Text style={styles.buttonText}>
@@ -218,9 +218,7 @@ export default function LoginScreen() {
 
           <TouchableOpacity
             style={styles.guestButton}
-            onPress={() =>
-              Alert.alert('Navegação', 'Indo para a tela de convidado...')
-            }
+            onPress={loginAsGuest}
           >
             <Text style={styles.guestButtonText}>Entrar como Convidado</Text>
           </TouchableOpacity>

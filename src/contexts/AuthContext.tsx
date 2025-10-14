@@ -17,9 +17,11 @@ interface User {
 
 interface AuthContextType {
   isAuthenticated: boolean;
+  isGuest: boolean; // convidado
   user: User | null;
   isLoading: boolean;
   login: (userData: User) => Promise<void>;
+  loginAsGuest: () => void; // convidado
   logout: () => Promise<void>;
 }
 
@@ -27,6 +29,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: React.PropsWithChildren) {
   const [user, setUser] = useState<User | null>(null);
+  const [isGuest, setIsGuest] = useState(false); // convidado
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -50,23 +53,33 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
 
   const login = async (userData: User) => {
     setUser(userData);
+    setIsGuest(false); // convidado
     api.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`;
     await AsyncStorage.setItem('@LumiLivre:user', JSON.stringify(userData));
   };
 
+  const loginAsGuest = () => { // convidado
+    setUser(null); 
+    setIsGuest(true);
+  };
+
   const logout = async () => {
     setUser(null);
+    setIsGuest(false);
     delete api.defaults.headers.common['Authorization'];
     await AsyncStorage.removeItem('@LumiLivre:user');
+    await AsyncStorage.removeItem('@LumiLivre:credentials');
   };
 
   return (
     <AuthContext.Provider
       value={{
         isAuthenticated: !!user,
+        isGuest, // convidado
         user,
         isLoading,
         login,
+        loginAsGuest, // convidado
         logout,
       }}
     >

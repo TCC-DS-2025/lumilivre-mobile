@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Image, StyleSheet, View, Animated } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 
 import HomeScreen from '../screens/App/Home';
 import SearchScreen from '../screens/App/Search';
@@ -21,25 +21,18 @@ export type TabParamList = {
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
-const TabBarIcon = ({ focused, activeIcon, inactiveIcon }: any) => {
-  const scale = new Animated.Value(focused ? 1.2 : 1);
-
-  Animated.spring(scale, {
-    toValue: focused ? 1.2 : 1,
-    friction: 4,
-    useNativeDriver: true,
-  }).start();
-
-  return (
-    <Animated.View style={{ transform: [{ scale }] }}>
-      <Image
-        source={focused ? activeIcon : inactiveIcon}
-        style={styles.icon}
-        resizeMode="contain"
-      />
-    </Animated.View>
-  );
-};
+const TabBarItem = ({ focused, activeIcon, inactiveIcon, label }: any) => (
+  <View style={styles.tabItemContainer}>
+    <Image
+      source={focused ? activeIcon : inactiveIcon}
+      style={[styles.icon, { tintColor: focused ? '#FFFFFF' : '#C9C9C9' }]}
+      resizeMode="contain"
+    />
+    <Text style={[styles.label, { color: focused ? '#FFFFFF' : '#C9C9C9' }]}>
+      {label}
+    </Text>
+  </View>
+);
 
 export default function TabNavigator() {
   return (
@@ -56,10 +49,11 @@ export default function TabNavigator() {
         component={SearchScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <TabBarIcon
+            <TabBarItem
               focused={focused}
               activeIcon={searchActiveIcon}
               inactiveIcon={searchIcon}
+              label="Livros" 
             />
           ),
         }}
@@ -69,13 +63,12 @@ export default function TabNavigator() {
         component={HomeScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <View style={styles.homeIconContainer}>
-              <TabBarIcon
-                focused={focused}
-                activeIcon={homeActiveIcon}
-                inactiveIcon={homeIcon}
-              />
-            </View>
+            <TabBarItem
+              focused={focused}
+              activeIcon={homeActiveIcon}
+              inactiveIcon={homeIcon}
+              label="Catálogo" 
+            />
           ),
         }}
       />
@@ -84,10 +77,11 @@ export default function TabNavigator() {
         component={ProfileScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <TabBarIcon
+            <TabBarItem
               focused={focused}
               activeIcon={profileActiveIcon}
               inactiveIcon={profileIcon}
+              label="Perfil" 
             />
           ),
         }}
@@ -99,35 +93,31 @@ export default function TabNavigator() {
 const styles = StyleSheet.create({
   tabBar: {
     position: 'absolute',
-    bottom: 25,
-    left: 20,
-    right: 20,
-    elevation: 5,
-    backgroundColor: '#762075',
-    borderRadius: 15,
-    height: 70,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 80,
+    paddingTop: 15,
+    backgroundColor: '#762075', 
     borderTopWidth: 0,
+    elevation: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.5,
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  tabItemContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    top: 5,
   },
   icon: {
-    width: 28,
-    height: 28,
+    width: 32, 
+    height: 32,
   },
-  homeIconContainer: {
-    top: -20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#762075',
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
+  label: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: 4,
   },
 });
