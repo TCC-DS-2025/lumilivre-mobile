@@ -9,7 +9,11 @@ import {
   FlatList,
   ActivityIndicator,
 } from 'react-native';
-import { buscarCatalogo, type GeneroCatalogo } from '../../services/livroService';
+
+import {
+  buscarCatalogo,
+  type GeneroCatalogo,
+} from '../../services/livroService';
 import BookCard from '../../components/BookCard';
 
 export default function HomeScreen() {
@@ -19,8 +23,13 @@ export default function HomeScreen() {
 
   useEffect(() => {
     const carregarDados = async () => {
+      setIsLoading(true);
+      setError(null);
       try {
         const dados = await buscarCatalogo();
+        if (dados.length === 0) {
+          setError('Nenhum livro encontrado no catálogo no momento.');
+        }
         setCatalogo(dados);
       } catch (err) {
         setError('Não foi possível carregar o catálogo.');
@@ -39,11 +48,15 @@ export default function HomeScreen() {
     );
   }
 
-  if (error) {
+  if (error || catalogo.length === 0) {
     return (
-      <View style={[styles.container, styles.center]}>
-        <Text style={styles.errorText}>{error}</Text>
-      </View>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={[styles.container, styles.center]}>
+          <Text style={styles.errorText}>
+            {error || 'Nenhum livro no catálogo.'}
+          </Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -65,7 +78,7 @@ export default function HomeScreen() {
             <FlatList
               data={genero.livros}
               renderItem={({ item }) => <BookCard livro={item} />}
-              keyExtractor={(item) => item.titulo + item.autor}
+              keyExtractor={(item, index) => `${item.titulo}-${index}`}
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingLeft: 24 }}

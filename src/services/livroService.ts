@@ -14,9 +14,9 @@ export interface GeneroCatalogo {
 export const buscarCatalogo = async (): Promise<GeneroCatalogo[]> => {
   try {
     const response = await api.get<GeneroCatalogo[]>('/livros/catalogo-mobile');
-    return response.data;
+    return response.data || [];
   } catch (error) {
     console.error('Erro ao buscar o catálogo:', error);
-    throw error;
+    return [];
   }
 };

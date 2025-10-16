@@ -1,10 +1,18 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Image, StyleSheet, Text, View, ImageStyle, StyleProp, Dimensions } from 'react-native'; 
+import {
+  Image,
+  StyleSheet,
+  Text,
+  View,
+  ImageStyle,
+  StyleProp,
+  Dimensions,
+} from 'react-native';
 
 // Nossas Telas
 import HomeScreen from '../screens/App/Home';
-import SearchScreen from '../screens/App/Search'; 
+import SearchScreen from '../screens/App/Search';
 import ProfileScreen from '../screens/App/Profile';
 
 // Ícones
@@ -23,18 +31,25 @@ export type TabParamList = {
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
-const TabBarItem = ({ focused, activeIcon, inactiveIcon, label, iconStyle }: {
+const TabBarItem = ({
+  focused,
+  activeIcon,
+  inactiveIcon,
+  label,
+  iconStyle,
+}: {
   focused: boolean;
   activeIcon: any;
   inactiveIcon: any;
   label: string;
-  iconStyle?: StyleProp<ImageStyle>; 
+  iconStyle?: StyleProp<ImageStyle>;
 }) => (
   <View style={styles.tabItemContainer}>
     <Image
       source={focused ? activeIcon : inactiveIcon}
-      style={[styles.icon, { tintColor: focused ? '#FFFFFF' : '#C9C9C9' }, iconStyle]}
+      style={[styles.icon, iconStyle]}
       resizeMode="contain"
+      tintColor={focused ? '#FFFFFF' : '#C9C9C9'}
     />
     <Text style={[styles.label, { color: focused ? '#FFFFFF' : '#C9C9C9' }]}>
       {label}
@@ -120,11 +135,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   icon: {
-    width: 30, 
+    width: 30,
     height: 30,
   },
   homeIcon: {
-    width: 42, 
+    width: 42,
     height: 42,
   },
   label: {
